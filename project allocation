@@ -1,0 +1,109 @@
+package readwrite;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.text.DateFormatSymbols;
+import java.text.SimpleDateFormat;
+import java.time.temporal.ChronoUnit;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.concurrent.TimeUnit;
+
+import org.apache.poi.EncryptedDocumentException;
+import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
+import org.apache.poi.ss.formula.functions.Days360;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.WorkbookFactory;
+import org.apache.xml.utils.res.StringArrayWrapper;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.chrome.ChromeDriver;
+
+public class projectAllocation {
+
+	
+	public static void main(String[] args) throws EncryptedDocumentException, InvalidFormatException, IOException 
+	{
+		
+		File file=new File("./testdata/Projectsheet.xlsx");
+		FileInputStream fis=new FileInputStream(file);
+		//FileOutputStream fos=new FileOutputStream(file);
+		Workbook wb=WorkbookFactory.create(fis);
+		Sheet sh1 = wb.getSheet("project_details");
+		Sheet sh3 = wb.getSheet("Role");
+		double leadeffort = sh3.getRow(1).getCell(1).getNumericCellValue();
+		int l1 = sh1.getLastRowNum();
+		
+		//System.out.println(l1);
+		for (int i = 1; i <=l1; i++) 
+		{
+			String projectName = sh1.getRow(i).getCell(0).getStringCellValue();
+			String ptype = sh1.getRow(i).getCell(1).getStringCellValue();
+			double effort = sh1.getRow(i).getCell(2).getNumericCellValue();
+			Date psd = sh1.getRow(i).getCell(3).getDateCellValue();
+			Date ped = sh1.getRow(i).getCell(4).getDateCellValue();
+			
+			long w = ped.getTime() - psd.getTime();
+			
+			long workingdays = TimeUnit.DAYS.convert(w, TimeUnit.MILLISECONDS);
+			
+			System.out.println(workingdays);
+			String[] days = new String[(int) workingdays];
+			for (int j = 0; j < days.length; j++)
+			{
+				days[j]=null;
+			}
+			SimpleDateFormat simpleDateformat = new SimpleDateFormat("EEEE"); 
+            days[0]=simpleDateformat.format(psd);
+            System.out.println(days[0]);
+		    	for (int j = 1; j < workingdays; j++) 
+			     {
+				   if(days[j-1].equalsIgnoreCase("monday"))
+				   {
+					   days[j]="tuesday";
+				   }
+				   else if(days[j-1].equalsIgnoreCase("tuesday"))
+				   {
+					   days[j]="wednesday";
+				   }
+				   else if(days[j-1].equalsIgnoreCase("wednesday"))
+				   {
+					   days[j]="thursday";
+				   }
+				   else if(days[j-1].equalsIgnoreCase("thursday"))
+				   {
+					   days[j]="friday";
+				   }
+				   else if(days[j-1].equalsIgnoreCase("friday"))
+				   {
+					   days[j]="satarday";
+				   }
+				   else if(days[j-1].equalsIgnoreCase("saturday"))
+				   {
+					   days[j]="sunday";
+				   }
+				   else
+				   {
+					   days[j]="monday";
+				   }
+		      	 }
+		    	
+		    	for (int j = 0; j < days.length; j++)
+				{
+		    		System.out.println(days[j]);
+				}	
+		
+		}
+		
+		
+		
+		System.setProperty("webdriver.chrome.driver", "./exefiles/chromedriver.exe");
+		//WebDriver driver=new ChromeDriver();
+		
+
+	}
+
+}
