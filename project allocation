@@ -15,9 +15,13 @@ import java.util.concurrent.TimeUnit;
 import org.apache.poi.EncryptedDocumentException;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.ss.formula.functions.Days360;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellType;
+import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.apache.xml.utils.res.StringArrayWrapper;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
@@ -30,7 +34,7 @@ public class projectAllocation {
 		
 		File file=new File("./testdata/Projectsheet.xlsx");
 		FileInputStream fis=new FileInputStream(file);
-		//FileOutputStream fos=new FileOutputStream(file);
+		
 		Workbook wb=WorkbookFactory.create(fis);
 		Sheet sh1 = wb.getSheet("project_details");
 		Sheet sh3 = wb.getSheet("Role");
@@ -40,6 +44,7 @@ public class projectAllocation {
 		//System.out.println(l1);
 		for (int i = 1; i <=l1; i++) 
 		{
+			Row rw = sh1.getRow(i);
 			String projectName = sh1.getRow(i).getCell(0).getStringCellValue();
 			String ptype = sh1.getRow(i).getCell(1).getStringCellValue();
 			double effort = sh1.getRow(i).getCell(2).getNumericCellValue();
@@ -58,7 +63,7 @@ public class projectAllocation {
 			}
 			SimpleDateFormat simpleDateformat = new SimpleDateFormat("EEEE"); 
             days[0]=simpleDateformat.format(psd);
-            System.out.println(days[0]);
+            //System.out.println(days[0]);
 		    	for (int j = 1; j < workingdays; j++) 
 			     {
 				   if(days[j-1].equalsIgnoreCase("monday"))
@@ -79,7 +84,7 @@ public class projectAllocation {
 				   }
 				   else if(days[j-1].equalsIgnoreCase("friday"))
 				   {
-					   days[j]="satarday";
+					   days[j]="saturday";
 				   }
 				   else if(days[j-1].equalsIgnoreCase("saturday"))
 				   {
@@ -90,12 +95,55 @@ public class projectAllocation {
 					   days[j]="monday";
 				   }
 		      	 }
-		    	
+		    	int actworkingd=0;
 		    	for (int j = 0; j < days.length; j++)
 				{
-		    		System.out.println(days[j]);
+		    		if(days[j].equalsIgnoreCase("sunday") || days[j].equalsIgnoreCase("saturday"))
+		    		{
+		    		//System.out.println("holiday");
+		    		}
+		    		else
+		    		{
+		    			actworkingd++;
+		    		}
+		    		//System.out.println(days[j]);
 				}	
+		    	
 		
+		    	// sheet 1 data typing
+		    	
+		    	
+		    	for (int j = 5; j <=7; j++) 
+				    	{
+							
+						
+				    	FileOutputStream fos=new FileOutputStream(file);
+				    	
+				    	Cell cl=rw.createCell(j);
+				    	cl.setCellType(CellType.NUMERIC);
+						    	if(j==5)
+						    	{
+						    		cl.setCellValue(workingdays);	
+						    	}
+						    	else if(j==6)
+						    	{
+						    		cl.setCellValue(actworkingd);
+						    	}
+						    	else
+						    	{
+						    		cl.setCellValue(actworkingd*9);
+						    	}
+						    	wb.write(fos);
+				    	}
+		    	
+		    	//sheet 2 data typing
+		    	
+		    	if(ptype.equalsIgnoreCase("manual"))
+		    	{
+		    		Sheet sh2 = wb.getSheet("Main_Resource");
+		    	}
+		    	
+		    	
 		}
 		
 		
