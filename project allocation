@@ -141,6 +141,14 @@ public class projectAllocation {
 		    	if(ptype.equalsIgnoreCase("manual"))
 		    	{
 		    		Sheet sh2 = wb.getSheet("Main_Resource");
+				int l2 = sh2.getLastRowNum();
+				for(int j=0; j<=l2; j++)
+				{
+				 sh2.getRow(i);
+				}
+				
+				FileOutputStream fos=new FileOutputStream(file);
+				
 		    	}
 		    	
 		    	
